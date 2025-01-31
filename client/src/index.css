@@ -10,3 +10,6 @@ body{
   align-items: center;
   @apply bg-slate-100
 }
+#root{
+  width: 100%;;
+}

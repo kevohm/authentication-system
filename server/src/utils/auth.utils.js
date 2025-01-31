@@ -4,10 +4,9 @@ import jwt from "jsonwebtoken";
 export const hashPassword = async (password) => {
   const hash = bcrypt.genSalt();
   const hashedPassword = await bcrypt.hash(password, hash);
-  return hashPassword;
+  return hashedPassword;
 };
 export const verifyPassword = async (password, hashedPassword) =>{
-  console.log(password, hashPassword)
   return await bcrypt.compare(password, hashedPassword)
 }
 

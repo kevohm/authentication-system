@@ -10,6 +10,16 @@ export const UserSchema = z.object(
       .email({
         message: "Email must be a valid email address",
       }),
+    first_name: z
+      .string({
+        message: "First name must be a string",
+        required_error: "First name must be provided",
+      }),
+      last_name: z
+      .string({
+        message: "Last name must be a string",
+        required_error: "Last name must be provided",
+      }),
     password: z
       .string({
         message: "Password must be a string",
@@ -32,12 +42,12 @@ export const UserSchema = z.object(
       .refine((password) => /[!@#$%^&*(),.?":{}|<>]/.test(password), {
         message: "Password must contain at least one special character",
       }),
-    phone_number: z
-      .string({
-        message: "Phone Number must be a string",
-        required_error: "Phone Number must be provided",
-      })
-      .startsWith("+254", { message: "Phone number must start with +254" }),
+    // phone_number: z
+    //   .string({
+    //     message: "Phone Number must be a string",
+    //     required_error: "Phone Number must be provided",
+    //   })
+    //   .startsWith("+254", { message: "Phone number must start with +254" }),
   },
   { message: "Please provide all required fields" }
 );

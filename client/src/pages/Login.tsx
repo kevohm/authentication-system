@@ -1,8 +1,11 @@
-import React, { useState, FormEvent } from "react";
-import axios from "axios";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { AxiosError } from "axios";
+import React, { FormEvent, useState } from "react";
+import useAuth from "../hooks/useAuth";
 
 const Login: React.FC = () => {
-    // const base_url = import.meta.env.VITE_BASE_URL;
+  const navigate = useNavigate();
+  const { axiosClient } = useAuth();
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
@@ -10,86 +13,82 @@ const Login: React.FC = () => {
 
   const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
+    setSuccess("");
+    setError("");
     try {
-      // Step 1: Fetch CSRF Token
-      const csrfResponse = await axios.get<{ csrfToken: string }>(
-        "http://localhost:3000/auth/csrf",
+      await axiosClient.post(
+        `/auth/login`,
+        { email: username, password },
         {
-          withCredentials: true, // Ensures cookies are sent
+          withCredentials: true,
         }
       );
-      const csrfToken = csrfResponse.data.csrfToken;
-
-      // Step 2: Sign In
-      const response = await axios.post(
-        "http://localhost:3000/auth/signin/credentials",
-        {
-          username,
-          password,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            "X-CSRF-Token": csrfToken,
-          },
-          withCredentials: true, // Include cookies for the session
-        }
-      );
-
-      if (response.status === 200) {
-        setSuccess("Logged in successfully!");
-        setError("");
+      setSuccess("Successfully Logged In");
+      setTimeout(() => navigate({ to: "/posts", replace: true }), 3000);
+    } catch (error) {
+      const e = error as AxiosError;
+      let message = "Login Failed";
+      if (e?.response?.data) {
+        message = e.response?.data?.message;
       }
-    } catch (err) {
-      if (axios.isAxiosError(err)) {
-        setError(err.response?.data?.message || "Invalid credentials or server error.");
-      } else {
-        setError("An unexpected error occurred.");
-      }
-      setSuccess("");
+      setError(message);
     }
   };
 
-  return (<div className="w-full max-w-md p-6 bg-white rounded shadow">
-    <h2 className="mb-6 text-2xl font-bold text-center text-gray-800">Login</h2>
-    <form onSubmit={handleLogin} className="space-y-4">
-      <div>
-        <label htmlFor="username" className="block text-sm font-medium text-gray-700">
-          Username
-        </label>
-        <input
-          id="username"
-          type="text"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          required
-          className="w-full px-4 py-2 mt-1 border rounded-lg focus:outline-none focus:ring focus:ring-indigo-500"
-        />
-      </div>
-      <div>
-        <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-          Password
-        </label>
-        <input
-          id="password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          className="w-full px-4 py-2 mt-1 border rounded-lg focus:outline-none focus:ring focus:ring-indigo-500"
-        />
-      </div>
-      <button
-        type="submit"
-        className="w-full px-4 py-2 text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring focus:ring-indigo-500"
-      >
+  return (
+    <div className="w-96 p-6 bg-white rounded-lg shadow">
+      <h2 className="mb-6 text-2xl font-bold text-center text-gray-800">
         Login
-      </button>
-    </form>
-    {error && <p className="mt-4 text-sm text-red-500">{error}</p>}
-    {success && <p className="mt-4 text-sm text-green-500">{success}</p>}
-  </div>
+      </h2>
+      <form onSubmit={handleLogin} className="space-y-4">
+        <div>
+          <label
+            htmlFor="username"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Email
+          </label>
+          <input
+            id="username"
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+            className="w-full px-4 py-2 mt-1 border rounded-lg focus:outline-none focus:ring focus:ring-indigo-500"
+          />
+        </div>
+        <div>
+          <label
+            htmlFor="password"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Password
+          </label>
+          <input
+            id="password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            className="w-full px-4 py-2 mt-1 border rounded-lg focus:outline-none focus:ring focus:ring-indigo-500"
+          />
+        </div>
+        <button
+          type="submit"
+          className="w-full px-4 py-2 text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring focus:ring-indigo-500"
+        >
+          Login
+        </button>
+      </form>
+      {error && <p className="mt-4 text-sm text-red-500">{error}</p>}
+      {success && <p className="mt-4 text-sm text-green-500">{success}</p>}
+      <p className="mt-4 text-center text-sm text-gray-600">
+        Don't have an account?{" "}
+        <Link to="/register" className="text-indigo-600 hover:underline">
+          Register
+        </Link>
+      </p>
+    </div>
   );
 };
 

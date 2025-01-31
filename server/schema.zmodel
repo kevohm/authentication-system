@@ -10,29 +10,44 @@ generator client {
     provider = "prisma-client-js"
 }
 
+abstract model Base {
+     id       String @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+
 /// User model
-model User {
-    id       String @id @default(cuid())
+model User extends Base {
+    first_name String
+    last_name String
     email    String @unique
-    password String @password
+    password String @password @omit
+    role roles @default(user)
     posts    Post[]
 
-    // // everybody can signup
-    // @@allow('create', true)
-
-    // // full access by self
-    // @@allow('all', auth() == this)
+    // everybody can signup
     @@allow('create', true)
-    @@allow('read', true)
-    @@allow('update', auth() == this)
-    @@allow('delete', auth() == this)
+
+    // full access by self
+    @@allow('all', auth() == this || auth().role == "admin")
+
+}
+enum roles{
+    user
+    admin
+}
+
+model sessions{
+  session_id String  @id @db.VarChar(128)
+  expires    Int     
+  data       String  @db.Text
+
+  @@index([expires])
 }
 
 /// Post model
-model Post {
-    id        String   @id @default(cuid())
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+model Post extends Base {
     title     String   @length(1, 256)
     content   String
     published Boolean  @default(false)
@@ -43,5 +58,5 @@ model Post {
     @@allow('read', auth() != null && published)
 
     // full access by author
-    @@allow('all', author == auth())
+    @@allow('all', author == auth() || auth().role == "admin")
 }
