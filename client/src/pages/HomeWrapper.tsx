@@ -14,24 +14,41 @@ const HomeWrapper = () => {
           Home
         </Link>{" "}
         {user ? (
+          <>
+          
           <Link
             to="/posts"
             className="[&.active]:font-bold [&.active]:text-indigo-600"
           >
             Posts
           </Link>
+          <Link
+            to="/profile"
+            className="[&.active]:font-bold [&.active]:text-indigo-600"
+          >
+            Profile
+          </Link>
+
+          </>
         ) : (
-          ""
+          <>
+             <Link
+              to="/login"
+              className="[&.active]:font-bold [&.active]:text-indigo-600"
+            >
+              Login
+            </Link>
+            <Link
+              to="/register"
+              className="[&.active]:font-bold [&.active]:text-indigo-600"
+            >
+              Register
+            </Link>
+          </>
         )}
-        <Link
-          to="/login"
-          className="[&.active]:font-bold [&.active]:text-indigo-600"
-        >
-          Login
-        </Link>
       </div>
       <hr />
-      <div className="w-full h-full flex items-start py-10 justify-center bg-gray-100 overflow-y-scroll">
+      <div className="w-full h-full flex items-start justify-center bg-gray-100 overflow-y-scroll">
         <Outlet />
       </div>
       <TanStackRouterDevtools />

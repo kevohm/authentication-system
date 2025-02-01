@@ -2,19 +2,18 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { AxiosError } from "axios";
 import React, { FormEvent, useState } from "react";
 import useAuth from "../hooks/useAuth";
+import { CustomErrorResponse } from "../types/axios.types";
+import { toast } from "react-toastify";
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
   const { axiosClient } = useAuth();
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [error, setError] = useState<string>("");
-  const [success, setSuccess] = useState<string>("");
 
   const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setSuccess("");
-    setError("");
+
     try {
       await axiosClient.post(
         `/auth/login`,
@@ -23,20 +22,20 @@ const Login: React.FC = () => {
           withCredentials: true,
         }
       );
-      setSuccess("Successfully Logged In");
-      setTimeout(() => navigate({ to: "/posts", replace: true }), 3000);
+      toast.success("Successfully Logged In"); 
+      setTimeout(() => navigate({ to: "/posts", reloadDocument:true }), 3000);
     } catch (error) {
-      const e = error as AxiosError;
+      const e = error as AxiosError<CustomErrorResponse>;
       let message = "Login Failed";
       if (e?.response?.data) {
         message = e.response?.data?.message;
       }
-      setError(message);
+       toast.error(message); 
     }
   };
 
   return (
-    <div className="w-96 p-6 bg-white rounded-lg shadow">
+    <div className="w-96 my-10 p-6 bg-white rounded-lg shadow">
       <h2 className="mb-6 text-2xl font-bold text-center text-gray-800">
         Login
       </h2>
@@ -80,8 +79,6 @@ const Login: React.FC = () => {
           Login
         </button>
       </form>
-      {error && <p className="mt-4 text-sm text-red-500">{error}</p>}
-      {success && <p className="mt-4 text-sm text-green-500">{success}</p>}
       <p className="mt-4 text-center text-sm text-gray-600">
         Don't have an account?{" "}
         <Link to="/register" className="text-indigo-600 hover:underline">

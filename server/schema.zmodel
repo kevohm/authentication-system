@@ -23,11 +23,12 @@ model User extends Base {
     last_name String
     email    String @unique
     password String @password @omit
-    role roles @default(user)
+    role roles @default(user) @omit
     posts    Post[]
 
     // everybody can signup
     @@allow('create', true)
+    @@allow('read', auth() != null)
 
     // full access by self
     @@allow('all', auth() == this || auth().role == "admin")
@@ -49,14 +50,14 @@ model sessions{
 /// Post model
 model Post extends Base {
     title     String   @length(1, 256)
-    content   String
+    content   String @db.MediumText()
     published Boolean  @default(false)
     author    User     @relation(fields: [authorId], references: [id])
     authorId  String
 
     // allow read for all signin users
-    @@allow('read', auth() != null && published)
+    @@allow('read', auth() != null)
 
     // full access by author
-    @@allow('all', author == auth() || auth().role == "admin")
+    @@allow('all', author.id == auth().id || auth().role == "admin")
 }

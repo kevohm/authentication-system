@@ -51,3 +51,24 @@ export const UserSchema = z.object(
   },
   { message: "Please provide all required fields" }
 );
+
+
+export const UserLoginSchema = z.object(
+  {
+    email: z
+      .string({
+        message: "Email must be a string",
+        required_error: "Email must be provided",
+      }).nonempty('Email must be provided')
+      .email({
+        message: "Email must be a valid email address",
+      }),
+    password: z
+      .string({
+        message: "Password must be a string",
+        required_error: "Password must be provided",
+      }).nonempty('Password must be provided')
+
+  },
+  { message: "Please provide all required fields" }
+);

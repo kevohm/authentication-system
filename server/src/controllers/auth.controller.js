@@ -1,9 +1,9 @@
 import { db } from "../config/prisma.config.js";
-import { UserSchema } from "../model/user.model.js";
-import { encryptData, verifyPassword } from "../utils/auth.utils.js";
+import { UserLoginSchema, UserSchema } from "../model/user.model.js";
+import { encryptData, hashPassword, verifyPassword } from "../utils/auth.utils.js";
 
 export async function currentUser(req, res) {
-  const user = await db.user.findUnique({ where: { id: req.user.id } });
+  const user = await req.prisma.user.findUnique({ where: { id: req.user.id } });
   res.status(201).json({ message: "User details", user });
 }
 export async function signup(req, res) {
@@ -13,17 +13,18 @@ export async function signup(req, res) {
   if (user) {
     return res.status(401).json({ message: "User already exists" });
   }
-  await req.prisma.user.create({
-    data
+  const hashedPassword = await hashPassword(data.password);
+  await req.db.user.create({
+    data:{
+      ...data,
+      password:hashedPassword,
+    }
   });
   res.status(201).json({ message: "User Created" });
 }
 
 export async function login(req, res) {
-  const { email, password } = await UserSchema.pick({
-    email: true,
-    password: true,
-  }).parseAsync(req.body);
+  const { email, password } = await UserLoginSchema.parseAsync(req.body);
   if (req.session.isAuthenticated) {
     return res.status(200).json({ message: "Already Logged In" });
   }
@@ -43,7 +44,7 @@ export async function login(req, res) {
   }
   const validPassword = await verifyPassword(password, user.password);
   if (!validPassword) {
-    return res.status(401).json({ message: "Invalid Credentials" });
+    return res.status(401).json({ message: "Invalid Password" });
   }
   const token = await encryptData({ id: user.id });
   req.session.token = token;

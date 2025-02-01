@@ -3,6 +3,7 @@ import {
   createPost,
   deletePost,
   getAllPosts,
+  getAllUserPosts,
   getPostById,
   updatePost,
 } from "../controllers/post.controller.js";
@@ -16,6 +17,8 @@ router.route("/")
   .get(authMiddleware, getAllPosts);
 
 // Route for getting a post by ID
+router.route("/by/:id")
+  .get(authMiddleware, getAllUserPosts)
 router.route("/:id")
   .get(authMiddleware, getPostById)
   .put(authMiddleware, updatePost)

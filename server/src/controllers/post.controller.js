@@ -25,7 +25,21 @@ export async function createPost(req, res) {
 // Get all posts
 export async function getAllPosts(req, res) {
   const posts = await req.prisma.post.findMany({
-    where: { authorId: req.user.id }, // Filter by the logged-in user
+    where:{
+      published:true
+    },
+    orderBy: { createdAt: "desc" }, // Order by creation time (latest first)
+  });
+
+  res.status(200).json({ message: "Posts fetched", posts });
+}
+// Get single user posts
+export async function getAllUserPosts(req, res) {
+  const { id } = req.params;
+  const posts = await req.prisma.post.findMany({
+    where: {
+      authorId:id,
+    },
     orderBy: { createdAt: "desc" }, // Order by creation time (latest first)
   });
 
@@ -53,7 +67,9 @@ export async function getPostById(req, res) {
 // Update a post
 export async function updatePost(req, res) {
   const { id } = req.params;
-  const { title, content, published } = await PostSchema.partial().parseAsync(req.body);
+  const { title, content, published } = await PostSchema.partial().parseAsync(
+    req.body
+  );
 
   const post = await req.prisma.post.findUnique({ where: { id } });
 

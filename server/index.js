@@ -13,6 +13,7 @@ import { postRouter } from "./src/routes/post.route.js";
 import { verifyData } from "./src/utils/auth.utils.js";
 
 import { enhance } from "@zenstackhq/runtime";
+import { userRouter } from "./src/routes/user.route.js";
 
 const MySQLStore = MySQLSessionStore(session);
 
@@ -25,7 +26,7 @@ var sess = {
   resave: false,
   saveUninitialized: false,
   cookie: {
-    maxAge: 1000 * 60, // 1 hr
+    maxAge: 1000 * 60 * 60, // 1 hr
   },
 };
 
@@ -62,6 +63,7 @@ app.use(
 
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/posts", postRouter);
+app.use("/api/v1/users", userRouter);
 
 app.use(ErrorHandler);
 

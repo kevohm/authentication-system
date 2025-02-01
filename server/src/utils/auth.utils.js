@@ -1,9 +1,8 @@
-import bcrypt from "bcryptjs";
+import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 export const hashPassword = async (password) => {
-  const hash = bcrypt.genSalt();
-  const hashedPassword = await bcrypt.hash(password, hash);
+  const hashedPassword = await bcrypt.hash(password, 10);
   return hashedPassword;
 };
 export const verifyPassword = async (password, hashedPassword) =>{
