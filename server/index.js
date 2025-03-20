@@ -7,7 +7,6 @@ import { ErrorHandler } from "./src/middleware/error.middleware.js";
 
 import { dbOptions } from "./src/config/mysql.config.js";
 import { prisma } from "./src/config/prisma.config.js";
-import { authMiddleware } from "./src/middleware/auth.middleware.js";
 import { authRouter } from "./src/routes/auth.route.js";
 import { postRouter } from "./src/routes/post.route.js";
 import { verifyData } from "./src/utils/auth.utils.js";
